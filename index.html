@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest List Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+        }
+
+        #loginPage, #mainPage {
+            display: none;
+            text-align: center;
+        }
+
+        #loginPage {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 300px;
+            max-width: 90%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        #downloadBtn, #clearBtn {
+            margin-top: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage">
+        <h1>Login</h1>
+        <input id="password" type="password" placeholder="Enter password">
+        <button id="loginButton">Login</button>
+        <p id="errorMessage" style="color: red; display: none;">Incorrect password. Please try again.</p>
+    </div>
+
+    <!-- Main Guest List Page -->
+    <div id="mainPage">
+        <h1 id="Head">Reception Guest List</h1>
+
+        <label for="idNumber">ID Number:</label>
+        <input id="idNumber" type="text" placeholder="Enter ID number">
+
+        <label for="Name">First Name:</label>
+        <input id="Name" type="text" placeholder="Enter first name">
+
+        <label for="Surname">Last Name:</label>
+        <input id="Surname" type="text" placeholder="Enter last name">
+
+        <label for="Phone">Phone Number:</label>
+        <input id="Phone" type="tel" placeholder="Enter phone number">
+
+        <button id="myclick">Submit</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Number</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Phone Number</th>
+                    <th>Date</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                </tr>
+            </thead>
+            <tbody id="guestTableBody">
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <button id="downloadBtn">Download Guest List</button>
+        <button id="clearBtn">Clear Table</button>
+    </div>
+
+    <!-- Include SheetJS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // References to login elements
+        const loginPage = document.getElementById('loginPage');
+        const mainPage = document.getElementById('mainPage');
+        const loginButton = document.getElementById('loginButton');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Password to access the main page
+        const PASSWORD = "Tshitshithe@01";
+
+        // Show login page initially
+        loginPage.style.display = "flex";
+
+        // Login functionality
+        loginButton.addEventListener('click', () => {
+            if (passwordInput.value === PASSWORD) {
+                loginPage.style.display = "none";
+                mainPage.style.display = "block";
+            } else {
+                errorMessage.style.display = "block";
+            }
+        });
+
+        // References to main page elements
+        const idInput = document.getElementById('idNumber');
+        const nameInput = document.getElementById('Name');
+        const surnameInput = document.getElementById('Surname');
+        const phoneInput = document.getElementById('Phone');
+        const submitButton = document.getElementById('myclick');
+        const guestTableBody = document.getElementById('guestTableBody');
+        const downloadButton = document.getElementById('downloadBtn');
+        const clearButton = document.getElementById('clearBtn');
+
+        let guests = []; // Array to hold guest data
+
+        // Submit button functionality
+        submitButton.addEventListener('click', () => {
+            const idNumber = idInput.value.trim();
+            const firstName = nameInput.value.trim();
+            const lastName = surnameInput.value.trim();
+            const phoneNumber = phoneInput.value.trim();
+
+            if (idNumber && firstName && lastName && phoneNumber) {
+                const now = new Date();
+                const date = now.toLocaleDateString();
+                const timeIn = now.toLocaleTimeString();
+
+                // Add guest to the array
+                const guest = { idNumber, firstName, lastName, phoneNumber, date, timeIn, timeOut: "" };
+                guests.push(guest);
+
+                // Add guest to the table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${idNumber}</td>
+                    <td class="clickable">${firstName}</td>
+                    <td>${lastName}</td>
+                    <td>${phoneNumber}</td>
+                    <td>${date}</td>
+                    <td>${timeIn}</td>
+                    <td class="timeOutCell"></td>
+                `;
+                guestTableBody.appendChild(row);
+
+                row.querySelector('.clickable').addEventListener('click', () => {
+                    const timeOut = new Date().toLocaleTimeString();
+                    row.querySelector('.timeOutCell').textContent = timeOut;
+                    const guestIndex = guests.findIndex(g => g.idNumber === idNumber);
+                    if (guestIndex !== -1) guests[guestIndex].timeOut = timeOut;
+                });
+
+                idInput.value = nameInput.value = surnameInput.value = phoneInput.value = '';
+            } else {
+                alert('Please fill out all fields.');
+            }
+        });
+
+        // Download button functionality
+        downloadButton.addEventListener('click', () => {
+            if (guests.length === 0) {
+                alert('No guests to download.');
+                return;
+            }
+            const now = new Date();
+            const fileName = `guest_list_${now.toLocaleDateString().replace(/\//g, '-')}_${now.toLocaleTimeString().replace(/:/g, '-')}.xlsx`;
+            const worksheet = XLSX.utils.json_to_sheet(guests);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Guest List");
+            XLSX.writeFile(workbook, fileName);
+        });
+
+        // Clear button functionality
+        clearButton.addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear the table?")) {
+                guests = [];
+                guestTableBody.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
