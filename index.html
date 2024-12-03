@@ -9,28 +9,81 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f9f9f9;
+            background: linear-gradient(to bottom right, #eef2f3, #8e9eab);
+            color: #333;
         }
 
         #loginPage, #mainPage {
             display: none;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
             text-align: center;
         }
 
         #loginPage {
             display: flex;
             flex-direction: column;
+            align-items: center;
+        }
+
+        #mainPage {
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+        }
+
+        #logpic {
+            width: 100px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
         }
 
         input, button {
             margin: 10px 0;
             padding: 10px;
-            width: 300px;
-            max-width: 90%;
+            width: 80%;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        #inputsContainer input {
+            margin-bottom: 15px;
+            width: 60%;
         }
 
         table {
@@ -41,7 +94,7 @@
 
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
         }
 
@@ -57,41 +110,41 @@
             background-color: #f1f1f1;
         }
 
-        #downloadBtn, #clearBtn {
-            margin-top: 20px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
+        .clickable {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <!-- Login Page -->
     <div id="loginPage">
-        <h1>Login</h1>
+        <h1>Tshitshithe Register Login</h1>
         <input id="password" type="password" placeholder="Enter password">
         <button id="loginButton">Login</button>
         <p id="errorMessage" style="color: red; display: none;">Incorrect password. Please try again.</p>
     </div>
 
-    <!-- Main Guest List Page -->
+    <!-- Main Page -->
     <div id="mainPage">
-        <h1 id="Head">Reception Guest List</h1>
+        <img id="logpic" src="d474b459-c9c9-4aef-ad17-b751fac63844-removebg-preview.png" alt="Logo">
+        <h1>Reception Guest List</h1>
+        <div id="inputsContainer">
+            <label for="idNumber">ID Number:</label>
+            <input id="idNumber" type="text" placeholder="Enter ID number">
 
-        <label for="idNumber">ID Number:</label>
-        <input id="idNumber" type="text" placeholder="Enter ID number">
+            <label for="Name">First Name:</label>
+            <input id="Name" type="text" placeholder="Enter first name">
 
-        <label for="Name">First Name:</label>
-        <input id="Name" type="text" placeholder="Enter first name">
+            <label for="Surname">Last Name:</label>
+            <input id="Surname" type="text" placeholder="Enter last name">
 
-        <label for="Surname">Last Name:</label>
-        <input id="Surname" type="text" placeholder="Enter last name">
+            <label for="Phone">Phone Number:</label>
+            <input id="Phone" type="tel" placeholder="Enter phone number">
 
-        <label for="Phone">Phone Number:</label>
-        <input id="Phone" type="tel" placeholder="Enter phone number">
-
-        <button id="myclick">Submit</button>
+            <button id="myclick">Submit</button>
+        </div>
 
         <table>
             <thead>
@@ -117,17 +170,15 @@
     <!-- Include SheetJS Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // References to login elements
         const loginPage = document.getElementById('loginPage');
         const mainPage = document.getElementById('mainPage');
         const loginButton = document.getElementById('loginButton');
         const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Password to access the main page
         const PASSWORD = "Tshitshithe@01";
 
-        // Show login page initially
+        // Initially display the login page
         loginPage.style.display = "flex";
 
         // Login functionality
@@ -140,7 +191,6 @@
             }
         });
 
-        // References to main page elements
         const idInput = document.getElementById('idNumber');
         const nameInput = document.getElementById('Name');
         const surnameInput = document.getElementById('Surname');
@@ -150,9 +200,8 @@
         const downloadButton = document.getElementById('downloadBtn');
         const clearButton = document.getElementById('clearBtn');
 
-        let guests = []; // Array to hold guest data
+        let guests = [];
 
-        // Submit button functionality
         submitButton.addEventListener('click', () => {
             const idNumber = idInput.value.trim();
             const firstName = nameInput.value.trim();
@@ -164,15 +213,13 @@
                 const date = now.toLocaleDateString();
                 const timeIn = now.toLocaleTimeString();
 
-                // Add guest to the array
                 const guest = { idNumber, firstName, lastName, phoneNumber, date, timeIn, timeOut: "" };
                 guests.push(guest);
 
-                // Add guest to the table
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${idNumber}</td>
-                    <td class="clickable">${firstName}</td>
+                    <td class="clickable">${idNumber}</td>
+                    <td>${firstName}</td>
                     <td>${lastName}</td>
                     <td>${phoneNumber}</td>
                     <td>${date}</td>
@@ -181,6 +228,7 @@
                 `;
                 guestTableBody.appendChild(row);
 
+                // Add timeout functionality on ID click
                 row.querySelector('.clickable').addEventListener('click', () => {
                     const timeOut = new Date().toLocaleTimeString();
                     row.querySelector('.timeOutCell').textContent = timeOut;
@@ -194,21 +242,17 @@
             }
         });
 
-        // Download button functionality
         downloadButton.addEventListener('click', () => {
             if (guests.length === 0) {
                 alert('No guests to download.');
                 return;
             }
-            const now = new Date();
-            const fileName = `guest_list_${now.toLocaleDateString().replace(/\//g, '-')}_${now.toLocaleTimeString().replace(/:/g, '-')}.xlsx`;
             const worksheet = XLSX.utils.json_to_sheet(guests);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Guest List");
-            XLSX.writeFile(workbook, fileName);
+            XLSX.writeFile(workbook, `guest_list.xlsx`);
         });
 
-        // Clear button functionality
         clearButton.addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the table?")) {
                 guests = [];
